@@ -1,0 +1,83 @@
+<div class="container">
+  <input
+    type="search"
+    class="form-control"
+    placeholder="Search Product"
+    [(ngModel)]="searchTerm"
+    (input)="filterProducts()"
+  />
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th (click)="sort('#')">
+          #
+          <span *ngIf="sortColumn === '#'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th (click)="sort('productID')">
+          Product ID
+          <span *ngIf="sortColumn === 'productID'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th (click)="sort('productName')">
+          Product Name
+          <span *ngIf="sortColumn === 'productName'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th (click)="sort('productType')">
+          Product Type
+          <span *ngIf="sortColumn === 'productType'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th (click)="sort('productOwner')">
+          Product Owner
+          <span *ngIf="sortColumn === 'productOwner'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th (click)="sort('productOwnerEmail')">
+          Product Owner Email
+          <span *ngIf="sortColumn === 'productOwnerEmail'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th (click)="sort('productPrice')">
+          Product Price
+          <span *ngIf="sortColumn === 'productPrice'">
+            {{ sortDirection === "asc" ? "▲" : "▼" }}
+          </span>
+        </th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of filteredProducts; let i = index">
+        <td>{{ product.originalIndex + 1 }}</td>
+        <td>{{ product.productID }}</td>
+        <td>{{ product.productName }}</td>
+        <td>{{ product.productType }}</td>
+        <td>{{ product.productOwner }}</td>
+        <td>{{ product.productOwnerEmail }}</td>
+        <td>{{ product.productPrice }}</td>
+        <td class="d-flex">
+          <button
+            class="btn btn-primary btn-sm"
+            (click)="onEditAction(product)"
+          >
+            Edit
+          </button>
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="onDeleteAction(product.productID)"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

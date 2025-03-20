@@ -1,0 +1,123 @@
+<form [formGroup]="productForm" (ngSubmit)="onSubmit(productForm)">
+  <div class="container">
+    <label for=""
+      >Product Name<input
+        class="form-control"
+        formControlName="productName"
+        type="text"
+    /></label>
+    <div
+      *ngIf="
+        productForm.get('productName')?.hasError('required') &&
+        (productForm.get('productName')?.dirty ||
+          productForm.get('productName')?.touched)
+      "
+      class="error"
+    >
+      Please enter the Product Name
+    </div>
+  </div>
+  <div class="container">
+    <label for=""
+      >Product Type<input
+        class="form-control"
+        type="text"
+        formControlName="productType"
+    /></label>
+    <div
+      *ngIf="
+        productForm.get('productType')?.hasError('required') &&
+        (productForm.get('productType')?.dirty ||
+          productForm.get('productType')?.touched)
+      "
+      class="error"
+    >
+      Please enter the Product Type
+    </div>
+  </div>
+  <div class="container">
+    <label for=""
+      >Product Owner<input
+        class="form-control"
+        type="text"
+        formControlName="productOwner"
+    /></label>
+    <div
+      *ngIf="
+        productForm.get('productOwner')?.hasError('required') &&
+        (productForm.get('productOwner')?.dirty ||
+          productForm.get('productOwner')?.touched)
+      "
+      class="error"
+    >
+      Please enter the Product Owner Name
+    </div>
+  </div>
+  <div class="container">
+    <label for=""
+      >Owner Email<input
+        class="form-control"
+        type="text"
+        formControlName="productOwnerEmail"
+    /></label>
+    <div
+      *ngIf="
+        productForm.get('productOwnerEmail')?.hasError('required') &&
+        (productForm.get('productOwnerEmail')?.dirty ||
+          productForm.get('productOwnerEmail')?.touched)
+      "
+      class="error"
+    >
+      Please enter the Product Owner Email
+    </div>
+    <div
+      *ngIf="
+        productForm.get('productOwnerEmail')?.hasError('email') &&
+        (productForm.get('productOwnerEmail')?.dirty ||
+          productForm.get('productOwnerEmail')?.touched)
+      "
+      class="error"
+    >
+      Please enter a valid email
+    </div>
+  </div>
+  <div class="container">
+    <label for=""
+      >Product Price<input
+        class="form-control"
+        type="number"
+        formControlName="productPrice"
+    /></label>
+    <div
+      *ngIf="
+        productForm.get('productPrice')?.hasError('required') &&
+        (productForm.get('productPrice')?.dirty ||
+          productForm.get('productPrice')?.touched)
+      "
+      class="error"
+    >
+      Please enter the Product Price
+    </div>
+    <div
+      *ngIf="
+        (productForm.get('productPrice')?.hasError('pattern') ||
+          productForm.get('productPrice')?.hasError('min')) &&
+        (productForm.get('productPrice')?.dirty ||
+          productForm.get('productPrice')?.touched)
+      "
+      class="error"
+    >
+      Product Price should be a number greater than 0
+    </div>
+  </div>
+  <br />
+  <div class="container">
+    <button
+      class="btn btn-primary"
+      type="submit"
+      [disabled]="productForm.invalid"
+    >
+      {{ isEditMode ? "Update Product" : "Add Product" }}
+    </button>
+  </div>
+</form>

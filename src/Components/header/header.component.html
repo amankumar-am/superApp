@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid navbar-container">
+    <div class="navbar-image">
+      <a class="navbar-brand" href="#">
+        <img src="images/amazon_logo_image.jpg" alt="Logo" />
+      </a>
+    </div>
+    <div class="navbar-heading">Test Product</div>
+    <div class="navbar-menu collapse navbar-collapse">
+      <div class="navbar-nav ms-auto">
+        <a href="" class="nav-link" routerLink="/home">Home</a>
+        <div
+          class="nav-item dropdown"
+          (mouseenter)="showSubmenu = true"
+          (mouseleave)="showSubmenu = false"
+        >
+          <a href="" class="nav-link">Products</a>
+          <div class="submenu" *ngIf="showSubmenu">
+            <a class="nav-link" routerLink="/products/add">Add Product</a>
+            <a class="nav-link" routerLink="/products/view">View Products</a>
+          </div>
+        </div>
+        <a href="" class="nav-link" routerLink="/about">About</a>
+        <a href="" class="nav-link" routerLink="/contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</nav>

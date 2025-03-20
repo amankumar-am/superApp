@@ -1,0 +1,10 @@
+th {
+  cursor: pointer;
+  position: relative;
+}
+
+th span {
+  position: absolute;
+  right: 5px;
+  font-size: 12px;
+}
