@@ -20,6 +20,9 @@ export class ViewProductComponent {
   isEditing: boolean = false;
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  totalPages: number = 1
 
   constructor(private router: Router) {
     if (!localStorage.getItem('products')) {
@@ -28,12 +31,40 @@ export class ViewProductComponent {
     this.products = localStorage.getItem('products') || '[]';
     this.productJSON = JSON.parse(this.products).map((product: any, index: number) => ({
       ...product,
-      originalIndex: index // Add original index
+      originalIndex: index
     }));
     this.filteredProducts = this.productJSON;
+    this.calculateTotalPages();
   }
 
-  // Filter products based on search term
+  calculateTotalPages() {
+    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+  }
+
+  getPaginatedProducts() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredProducts.slice(startIndex, endIndex);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  goToPage(page: number) {
+    if (page > 0 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
   filterProducts() {
     this.filteredProducts = this.productJSON.filter((product) =>
       Object.values(product).some((value: any) =>
@@ -42,12 +73,10 @@ export class ViewProductComponent {
     );
   }
 
-  // Navigate to the add-product component with the selected product data
   onEditAction(product: any): void {
     this.router.navigate(['/products/add'], { state: { product } });
   }
 
-  // Delete a product by its ID
   onDeleteAction(productID: string) {
     if (confirm('Are you sure you want to delete this product?')) {
       this.productJSON = this.productJSON.filter((product: any) => product.productID !== productID);
@@ -56,29 +85,24 @@ export class ViewProductComponent {
     }
   }
 
-  // Refresh the table by re-fetching data from localStorage
   refreshTable() {
     this.products = localStorage.getItem('products') || '[]';
     this.productJSON = JSON.parse(this.products).map((product: any, index: number) => ({
       ...product,
-      originalIndex: index // Reassign original index after refresh
+      originalIndex: index
     }));
     this.filteredProducts = this.productJSON;
   }
 
-  // Sort the table based on the column
   sort(column: string) {
     if (this.sortColumn === column) {
-      // Toggle sort direction if the same column is clicked again
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
-      // Default to ascending order for a new column
       this.sortColumn = column;
       this.sortDirection = 'asc';
     }
 
     if (column === '#') {
-      // Sort by original index
       this.filteredProducts.sort((a, b) => {
         if (this.sortDirection === 'asc') {
           return a.originalIndex - b.originalIndex;
@@ -87,7 +111,6 @@ export class ViewProductComponent {
         }
       });
     } else {
-      // Sort by other columns
       this.filteredProducts.sort((a, b) => {
         const valueA = a[column];
         const valueB = b[column];
@@ -101,5 +124,7 @@ export class ViewProductComponent {
         return 0;
       });
     }
+
+    this.currentPage = 1; // Reset to the first page after sorting
   }
 }

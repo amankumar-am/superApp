@@ -8,3 +8,46 @@ th span {
   right: 5px;
   font-size: 12px;
 }
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.btn-icon:hover {
+  opacity: 0.7;
+}
+
+/* Style for the icons */
+.fas {
+  font-size: 18px; /* Adjust the size of the icons */
+}
+
+.fa-edit {
+  color: #007bff; /* Blue color for edit icon */
+}
+
+.fa-trash-alt {
+  color: #dc3545; /* Red color for delete icon */
+}

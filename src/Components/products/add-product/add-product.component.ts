@@ -106,4 +106,8 @@ export class AddProductComponent implements OnInit {
     });
     return `PROD${maxID + 1}`;
   }
+
+  goBack() {
+    this.router.navigate(['/products/view']);
+  }
 }
