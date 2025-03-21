@@ -1,116 +1,127 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Products } from './initialProduct';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { ProductAPIService } from '../../../app/services/product-api.service';
 
 @Component({
   selector: 'app-view-product',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './view-product.component.html',
   styleUrl: './view-product.component.css'
 })
-export class ViewProductComponent {
-  initialProducts = Products;
-  products: string;
+export class ViewProductComponent implements OnInit {
+  products: any[] = []; // Array to store products fetched from the API
   searchTerm: string = '';
-  filteredProducts: any[] = [];
-  productJSON: any[] = [];
+  filteredProducts: any[] = []; // Array to store filtered products
   selectedProduct: any = null;
   isEditing: boolean = false;
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   currentPage: number = 1;
   itemsPerPage: number = 5;
-  totalPages: number = 1
+  totalPages: number = 1;
 
-  constructor(private router: Router) {
-    if (!localStorage.getItem('products')) {
-      localStorage.setItem('products', JSON.stringify(this.initialProducts));
-    }
-    this.products = localStorage.getItem('products') || '[]';
-    this.productJSON = JSON.parse(this.products).map((product: any, index: number) => ({
-      ...product,
-      originalIndex: index
-    }));
-    this.filteredProducts = this.productJSON;
-    this.calculateTotalPages();
+  constructor(private router: Router, private productService: ProductAPIService) { }
+
+  ngOnInit(): void {
+    this.loadProducts();
   }
 
-  calculateTotalPages() {
+  // Fetch all products from the API
+  loadProducts(): void {
+    this.productService.getAllProducts().subscribe({
+      next: (products) => {
+        this.products = products.map((product, index) => ({
+          ...product,
+          originalIndex: index // Add originalIndex to each product
+        }));
+        this.filteredProducts = [...this.products]; // Initialize filteredProducts
+        this.calculateTotalPages(); // Calculate total pages for pagination
+      },
+      error: (error) => {
+        console.error('Error fetching products:', error);
+      }
+    });
+  }
+
+  calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
   }
 
-  getPaginatedProducts() {
+  getPaginatedProducts(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredProducts.slice(startIndex, endIndex);
   }
 
-  nextPage() {
+  nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
   }
 
-  previousPage() {
+  previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
     }
   }
 
-  goToPage(page: number) {
+  goToPage(page: number): void {
     if (page > 0 && page <= this.totalPages) {
       this.currentPage = page;
     }
   }
 
-  filterProducts() {
-    this.filteredProducts = this.productJSON.filter((product) =>
+  filterProducts(): void {
+    this.filteredProducts = this.products.filter((product) =>
       Object.values(product).some((value: any) =>
         value.toString().toLowerCase().includes(this.searchTerm.toLowerCase())
-      )
-    );
+      ));
+    this.calculateTotalPages();
+    this.currentPage = 1;
   }
 
   onEditAction(product: any): void {
     this.router.navigate(['/products/add'], { state: { product } });
   }
 
-  onDeleteAction(productID: string) {
+  onDeleteAction(productID: string): void {
     if (confirm('Are you sure you want to delete this product?')) {
-      this.productJSON = this.productJSON.filter((product: any) => product.productID !== productID);
-      localStorage.setItem('products', JSON.stringify(this.productJSON));
-      this.refreshTable();
+      this.productService.deleteProduct(productID).subscribe({
+        next: () => {
+          this.loadProducts(); // Reload products after deletion
+          alert('Product deleted successfully!');
+        },
+        error: (error) => {
+          console.error('Error deleting product:', error);
+          alert('Failed to delete product.');
+        }
+      });
     }
   }
 
-  refreshTable() {
-    this.products = localStorage.getItem('products') || '[]';
-    this.productJSON = JSON.parse(this.products).map((product: any, index: number) => ({
-      ...product,
-      originalIndex: index
-    }));
-    this.filteredProducts = this.productJSON;
-  }
-
-  sort(column: string) {
+  sort(column: string): void {
     if (this.sortColumn === column) {
+      // Toggle sort direction if the same column is clicked again
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
+      // Default to ascending order for a new column
       this.sortColumn = column;
       this.sortDirection = 'asc';
     }
 
     if (column === '#') {
+      // Sort by originalIndex
       this.filteredProducts.sort((a, b) => {
         if (this.sortDirection === 'asc') {
-          return a.originalIndex - b.originalIndex;
+          return a.originalIndex - b.originalIndex; // Ascending order
         } else {
-          return b.originalIndex - a.originalIndex;
+          return b.originalIndex - a.originalIndex; // Descending order
         }
       });
     } else {
+      // Sort by other columns
       this.filteredProducts.sort((a, b) => {
         const valueA = a[column];
         const valueB = b[column];

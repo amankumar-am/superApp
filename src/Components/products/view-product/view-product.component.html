@@ -1,11 +1,16 @@
 <div class="container">
-  <input
-    type="search"
-    class="form-control"
-    placeholder="Search Product"
-    [(ngModel)]="searchTerm"
-    (input)="filterProducts()"
-  />
+  <div class="d-flex justify-content-between align-items-center">
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search Product"
+      [(ngModel)]="searchTerm"
+      (input)="filterProducts()"
+    />
+    <a class="nav-link" routerLink="/products/add"
+      ><button class="btn btn-primary">+</button></a
+    >
+  </div>
   <table class="table table-striped">
     <thead class="thead-dark">
       <tr>

@@ -1,4 +1,4 @@
-interface productType {
+export interface productType {
     productName: string;
     productType: string;
     productOwner: string;
