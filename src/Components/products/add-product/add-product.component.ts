@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
+import { Router, ActivatedRoute } from '@angular/router';
+import { ProductAPIService } from '../../../app/services/product-api.service';
 
 @Component({
   selector: 'app-add-product',
@@ -16,8 +17,9 @@ export class AddProductComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router, // Inject Router
-    private route: ActivatedRoute // Inject ActivatedRoute
+    private router: Router,
+    private route: ActivatedRoute,
+    private productService: ProductAPIService // Inject the API service
   ) { }
 
   ngOnInit(): void {
@@ -49,37 +51,49 @@ export class AddProductComponent implements OnInit {
         // Add new product
         this.addProduct(productData);
       }
-
-      form.reset();
-      this.router.navigate(['/products/view']).then((success) => {
-        if (!success) {
-          console.error('Navigation failed. Check if the route exists.');
-        }
-      });
     }
   }
 
   addProduct(productData: any) {
-    const productID = this.getNextProductID();
-    const newProduct = { ...productData, productID };
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
-    products.push(newProduct);
-    localStorage.setItem('products', JSON.stringify(products));
-    alert('Product added successfully!');
+    this.productService.createProduct(productData).subscribe({
+      next: (response) => {
+        alert('Product added successfully!');
+        this.productForm.reset();
+        this.router.navigate(['/products/view']).then((success) => {
+          if (!success) {
+            console.error('Navigation failed. Check if the route exists.');
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error adding product:', error);
+        alert('Failed to add product. Please try again.');
+      }
+    });
   }
 
   updateProduct(productData: any) {
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
-    const index = products.findIndex((p: any) => p.productID === this.productId);
+    if (this.productId) {
+      this.productService.updateProduct(this.productId, productData).subscribe({
+        next: (response) => {
+          console.log(response);
 
-    if (index !== -1) {
-      products[index] = { ...productData, productID: this.productId }; // Update the product
-      localStorage.setItem('products', JSON.stringify(products));
-      console.log('Product updated:', products[index]);
-      alert('Product updated successfully!');
+          alert('Product updated successfully!');
+          this.productForm.reset();
+          this.router.navigate(['/products/view']).then((success) => {
+            if (!success) {
+              console.error('Navigation failed. Check if the route exists.');
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Error updating product:', error);
+          alert('Failed to update product. Please try again.');
+        }
+      });
     } else {
-      console.error('Product not found for editing');
-      alert('Product not found!');
+      console.error('Product ID is missing.');
+      alert('Product ID is missing. Cannot update product.');
     }
   }
 
@@ -91,20 +105,6 @@ export class AddProductComponent implements OnInit {
       }
       return null;
     };
-  }
-
-  getNextProductID(): string {
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
-    let maxID = 0;
-    products.forEach((product: any) => {
-      if (product.productID) {
-        const idNumber = parseInt(product.productID.replace('PROD', ''), 10);
-        if (idNumber > maxID) {
-          maxID = idNumber;
-        }
-      }
-    });
-    return `PROD${maxID + 1}`;
   }
 
   goBack() {

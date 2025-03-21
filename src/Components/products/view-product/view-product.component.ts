@@ -11,9 +11,9 @@ import { ProductAPIService } from '../../../app/services/product-api.service';
   styleUrl: './view-product.component.css'
 })
 export class ViewProductComponent implements OnInit {
-  products: any[] = []; // Array to store products fetched from the API
+  products: any[] = [];
   searchTerm: string = '';
-  filteredProducts: any[] = []; // Array to store filtered products
+  filteredProducts: any[] = [];
   selectedProduct: any = null;
   isEditing: boolean = false;
   sortColumn: string = '';
@@ -28,16 +28,17 @@ export class ViewProductComponent implements OnInit {
     this.loadProducts();
   }
 
-  // Fetch all products from the API
   loadProducts(): void {
+    // Fetch all products from the API
     this.productService.getAllProducts().subscribe({
       next: (products) => {
+        // Add an originalIndex property to each product to keep track of the original order
         this.products = products.map((product, index) => ({
           ...product,
-          originalIndex: index // Add originalIndex to each product
+          originalIndex: index
         }));
-        this.filteredProducts = [...this.products]; // Initialize filteredProducts
-        this.calculateTotalPages(); // Calculate total pages for pagination
+        this.filteredProducts = [...this.products];
+        this.calculateTotalPages();
       },
       error: (error) => {
         console.error('Error fetching products:', error);
